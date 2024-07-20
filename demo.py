@@ -168,15 +168,27 @@ if '__main__' == __name__:
         key_i = 0
         result_filename = './result/{}/data_{}/seed_{}.txt'.format(args.model_type,args.data_type,cur_seed)
         os.makedirs(os.path.dirname(result_filename), exist_ok=True)
-        print("Hi")
+        results = []
         for it in ret:
-            
-            print()
-            print(f"f1: {it['f1']:.3f}, f1_eps: {it['f1_eps']:.3f}")
-            print(f"acc: {it['acc']:.3f}, acc_eps: {it['acc_eps']:.3f}")
-            print(f"auroc: {it['auroc']:.3f}")
-            print(f"auprc: {it['auprc']:.3f}")
-            print()
+            print("Hi")
+            #print()
+            #print(f"f1: {it['f1']:.3f}, f1_eps: {it['f1_eps']:.3f}")
+            #print(f"acc: {it['acc']:.3f}, acc_eps: {it['acc_eps']:.3f}")
+            #print(f"auroc: {it['auroc']:.3f}")
+            #print(f"auprc: {it['auprc']:.3f}")
+            #print()
+            result = {
+                'f1': round(it['f1'], 3),
+                'f1_eps': round(it['f1_eps'], 3),
+                'acc': round(it['acc'], 3),
+                'acc_eps': round(it['acc_eps'], 3),
+                'auroc': round(it['auroc'], 3),
+                'auprc': round(it['auprc'], 3)
+            }
+            results.append(result)
+        
+        for result in results:
+            print(result)
 
             
 
