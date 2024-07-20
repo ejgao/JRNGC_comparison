@@ -242,11 +242,18 @@ class JRNGC(nn.Module):
         jaco_gc = self.jacobian_causal(x).detach().cpu().numpy()
         ret = {}
         # TODO: compute my metrics 
+        print("Jaco gc")
+        print(jaco_gc)
+        print("True gc")
+        print(gc)
+
         
         
         maxlag = max(jaco_gc.shape[2], gc.shape[2])
         pred_gc =  np.pad(jaco_gc, ((0, 0), (0, 0), (maxlag - jaco_gc.shape[2], 0)), 'constant', constant_values=0)
         true_gc = np.pad(gc, ((0, 0), (0, 0), (maxlag - gc.shape[2], 0)), 'constant', constant_values=0)
+        print("Pred GC")
+        print(pred_gc)
         # same (following)
         # ground_truth_flattened = true_gc.flatten()
         # score_matrix_flattened = pred_gc.flatten()
