@@ -186,7 +186,32 @@ if '__main__' == __name__:
                 'auprc': round(it['auprc'], 3)
             }
             results.append(result)
-    print(results)
+    f1_scores = [result['f1'] for result in results]
+    f1_eps_scores = [result['f1_eps'] for result in results]
+    acc_scores = [result['acc'] for result in results]
+    acc_eps_scores = [result['acc_eps'] for result in results]
+    auroc_scores = [result['auroc'] for result in results]
+    auprc_scores = [result['auprc'] for result in results]
+
+    f1_mean = np.mean(f1_scores)
+    f1_eps_mean = np.mean(f1_eps_scores)
+    acc_mean = np.mean(acc_scores)
+    acc_eps_mean = np.mean(acc_eps_scores)
+    auroc_mean = np.mean(auroc_scores)
+    auprc_mean = np.mean(auprc_scores)
+
+    f1_sd = np.std(f1_scores)
+    f1_eps_sd = np.std(f1_eps_scores)
+    acc_sd = np.std(acc_scores)
+    acc_eps_sd = np.std(acc_eps_scores)
+    auroc_sd = np.std(auroc_scores)
+    auprc_sd = np.std(auprc_scores)
+    means = [f1_mean, f1_eps_mean, acc_mean, acc_eps_mean, auroc_mean, auprc_mean]
+    sds = [f1_sd, f1_eps_sd, acc_sd, acc_eps_sd, auroc_sd, auprc_sd]
+    print("Averages:")
+    print(means)
+    print("SDS: ")
+    print(sds)
         
     #     #for result in results:
     #         #print(result)
