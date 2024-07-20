@@ -118,7 +118,7 @@ if '__main__' == __name__:
                 np.save(data_dir+data_name+'_x_eval.npy',x_eval)
                 np.save(data_dir+data_name+'_gc.npy',gc)
                 np.save(data_dir+data_name+'_beta.npy', beta)
-                
+
             elif args.data_type == 'fmri':
                 print('-----fmri----')
                 x, x_eval, gc = fmri_net_sim(d=num_nodes, subject=args.f_subject, t=args.f_t, t_eval=args.f_t_eval)
@@ -168,6 +168,7 @@ if '__main__' == __name__:
         key_i = 0
         result_filename = './result/{}/data_{}/seed_{}.txt'.format(args.model_type,args.data_type,cur_seed)
         os.makedirs(os.path.dirname(result_filename), exist_ok=True)
+        print("Hi")
         for it in ret:
             
             print()
@@ -176,7 +177,7 @@ if '__main__' == __name__:
             print(f"auroc: {it['auroc']:.3f}")
             print(f"auprc: {it['auprc']:.3f}")
             print()
-            
+
             
 
             with open(result_filename, 'a') as f:
