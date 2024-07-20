@@ -168,7 +168,7 @@ if '__main__' == __name__:
         key_i = 0
         result_filename = './result/{}/data_{}/seed_{}.txt'.format(args.model_type,args.data_type,cur_seed)
         os.makedirs(os.path.dirname(result_filename), exist_ok=True)
-        results = []
+        #results = []
         for it in ret:
             print("Hi")
             #print()
