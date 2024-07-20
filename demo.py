@@ -113,10 +113,12 @@ if '__main__' == __name__:
             
             if args.data_type == 'var':
                 print("generating data from scratch...")
-                x, x_eval, gc = var_stable(d=num_nodes, t=args.var_t, t_eval=args.var_t_eval, lag=params['true_lag'], sd=params['noise_scale'],seed=cur_seed)
+                x, x_eval, gc, beta = var_stable(d=num_nodes, t=args.var_t, t_eval=args.var_t_eval, lag=params['true_lag'], sd=params['noise_scale'],seed=cur_seed)
                 np.save(data_dir+data_name+'_x.npy',x)
                 np.save(data_dir+data_name+'_x_eval.npy',x_eval)
                 np.save(data_dir+data_name+'_gc.npy',gc)
+                np.save(data_dir+data_name+'_beta.npy', beta)
+                
             elif args.data_type == 'fmri':
                 print('-----fmri----')
                 x, x_eval, gc = fmri_net_sim(d=num_nodes, subject=args.f_subject, t=args.f_t, t_eval=args.f_t_eval)
