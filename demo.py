@@ -187,10 +187,8 @@ if '__main__' == __name__:
             }
             results.append(result)
         
-        for result in results:
-            print(result)
-
-            
+        #for result in results:
+            #print(result)
 
             with open(result_filename, 'a') as f:
                 f.write("----Tt is running seed : {}----------------------------\n".format(cur_seed))
@@ -227,7 +225,7 @@ if '__main__' == __name__:
 
             key_i += 1
 
-            
+        print(results)
     for key,value in tot_perf_lag.items():
        
         perf=np.array(value["value"])
