@@ -143,7 +143,13 @@ class JRNGC(nn.Module):
         """
         x: [batch, d, T=lag+1]
         """
-        return self.loss_fn(self(x[:, :, :-1]), x[:, :, -1])
+        return self.loss_fn(
+            self(x[:, :, :-1]),
+            x[:, :, -1]
+        )
+    
+    #[0,1,2,3,4,5]
+    #[0,1,2,3,4]
     
  
 
@@ -188,8 +194,7 @@ class JRNGC(nn.Module):
                     struct_loss = 0
                 loss = pred_loss + struct_loss
                 
-
-                scaler.scale(loss).backward()
+                scaler.scale(loss).float().backward()
                 scaler.step(optimizer)
                 scaler.update()
          
@@ -236,7 +241,7 @@ class JRNGC(nn.Module):
         x = x.reshape(x.shape[0] * x.shape[1], x.shape[2], x.shape[3])
         jaco_gc = self.jacobian_causal(x).detach().cpu().numpy()
         ret = {}
-
+        # TODO: compute my metrics 
         
         
         maxlag = max(jaco_gc.shape[2], gc.shape[2])
