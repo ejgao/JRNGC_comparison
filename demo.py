@@ -82,7 +82,7 @@ if '__main__' == __name__:
     
     trials = params['trials']
     print_params=False
-
+    results = []
     for trial in range(args.current_start,trials):
         cur_seed=trial+seed
         print('current seed:{}'.format(cur_seed))
@@ -186,67 +186,68 @@ if '__main__' == __name__:
                 'auprc': round(it['auprc'], 3)
             }
             results.append(result)
+    print(results)
         
-        #for result in results:
-            #print(result)
+    #     #for result in results:
+    #         #print(result)
 
-            with open(result_filename, 'a') as f:
-                f.write("----Tt is running seed : {}----------------------------\n".format(cur_seed))
-                f.write("----Tt is running {}----------------------------\n".format(key_metric[key_i]))
+    #         with open(result_filename, 'a') as f:
+    #             f.write("----Tt is running seed : {}----------------------------\n".format(cur_seed))
+    #             f.write("----Tt is running {}----------------------------\n".format(key_metric[key_i]))
 
-                f.write('used_time:{:.6f}\n'.format(end_time - tm))
+    #             f.write('used_time:{:.6f}\n'.format(end_time - tm))
                
-                if args.model_type == 'JRNGC':
-                    f.write('the struct_loss is {}\n'.format(params['struct_loss_choice']))
-                f.write('it is using the yaml file:{} \n'.format(using_yaml_file))
-                f.write('f1: {:.3f}, f1_eps: {:.3f}\n'.format(it['f1'], it['f1_eps']))
-                f.write('acc: {:.3f}, acc_eps: {:.3f}\n'.format(it['acc'], it['acc_eps']))
-                f.write('auroc: {:.3f}\n'.format(it['auroc']))
-                f.write('auprc: {:.3f}\n'.format(it['auprc']))
-                if args.jaco_param:
-                    f.write(f'jacabian lam {args.jaco_param}\n')
-                f.write('\n')
-                f.write('best_loss:{:.5e}, train_loss:{:.5e}, eval_loss:{:.5e}\n'.format(best_loss_r,mean_pred_loss_r,eval_loss_r))
-                f.write('----------------------------\n')
-            if key_i ==0 :
-                for key,value in it.items():
-                    if key in ['f1','acc','auroc','auprc']:
-                        value = float(value)
-                        if key not in tot_perf_lag:
-                            tot_perf_lag[key]={"value":[],"mean":[],"std":[]}
-                        tot_perf_lag[key]["value"].append(value)
-            elif key_i == 1:
-                for key,value in it.items():
-                    if key in ['f1','acc','auroc','auprc']:
-                        value = float(value)
-                        if key not in tot_perf_no_lag:
-                            tot_perf_no_lag[key]={"value":[],"mean":[],"std":[]}
-                        tot_perf_no_lag[key]["value"].append(value)
+    #             if args.model_type == 'JRNGC':
+    #                 f.write('the struct_loss is {}\n'.format(params['struct_loss_choice']))
+    #             f.write('it is using the yaml file:{} \n'.format(using_yaml_file))
+    #             f.write('f1: {:.3f}, f1_eps: {:.3f}\n'.format(it['f1'], it['f1_eps']))
+    #             f.write('acc: {:.3f}, acc_eps: {:.3f}\n'.format(it['acc'], it['acc_eps']))
+    #             f.write('auroc: {:.3f}\n'.format(it['auroc']))
+    #             f.write('auprc: {:.3f}\n'.format(it['auprc']))
+    #             if args.jaco_param:
+    #                 f.write(f'jacabian lam {args.jaco_param}\n')
+    #             f.write('\n')
+    #             f.write('best_loss:{:.5e}, train_loss:{:.5e}, eval_loss:{:.5e}\n'.format(best_loss_r,mean_pred_loss_r,eval_loss_r))
+    #             f.write('----------------------------\n')
+    #         if key_i ==0 :
+    #             for key,value in it.items():
+    #                 if key in ['f1','acc','auroc','auprc']:
+    #                     value = float(value)
+    #                     if key not in tot_perf_lag:
+    #                         tot_perf_lag[key]={"value":[],"mean":[],"std":[]}
+    #                     tot_perf_lag[key]["value"].append(value)
+    #         elif key_i == 1:
+    #             for key,value in it.items():
+    #                 if key in ['f1','acc','auroc','auprc']:
+    #                     value = float(value)
+    #                     if key not in tot_perf_no_lag:
+    #                         tot_perf_no_lag[key]={"value":[],"mean":[],"std":[]}
+    #                     tot_perf_no_lag[key]["value"].append(value)
 
-            key_i += 1
+    #         key_i += 1
 
-        print(results)
-    for key,value in tot_perf_lag.items():
+    # #print(results)
+    # for key,value in tot_perf_lag.items():
        
-        perf=np.array(value["value"])
-        tot_perf_lag[key]['mean']=float(np.mean(perf))
-        tot_perf_lag[key]['std']=float(np.std(perf))
-    for key,value in tot_perf_no_lag.items():
+    #     perf=np.array(value["value"])
+    #     tot_perf_lag[key]['mean']=float(np.mean(perf))
+    #     tot_perf_lag[key]['std']=float(np.std(perf))
+    # for key,value in tot_perf_no_lag.items():
        
-        perf=np.array(value["value"])
-        tot_perf_no_lag[key]['mean']=float(np.mean(perf))
-        tot_perf_no_lag[key]['std']=float(np.std(perf))
-    f_dir = './result/{}/data_{}/'.format(args.model_type,args.data_type)
+    #     perf=np.array(value["value"])
+    #     tot_perf_no_lag[key]['mean']=float(np.mean(perf))
+    #     tot_perf_no_lag[key]['std']=float(np.std(perf))
+    # f_dir = './result/{}/data_{}/'.format(args.model_type,args.data_type)
     
-    json_filename = f_dir+data_name[:-3]
-    os.makedirs(os.path.dirname(json_filename), exist_ok=True)
-    yaml_filename = os.path.splitext(os.path.basename(args.yaml_dir))[0]
+    # json_filename = f_dir+data_name[:-3]
+    # os.makedirs(os.path.dirname(json_filename), exist_ok=True)
+    # yaml_filename = os.path.splitext(os.path.basename(args.yaml_dir))[0]
 
-    with open(json_filename+"_"+key_metric[0]+"_"+yaml_filename+"_"+'yaml'+".json",'w') as f:    
-        json.dump(tot_perf_lag,f)  
+    # with open(json_filename+"_"+key_metric[0]+"_"+yaml_filename+"_"+'yaml'+".json",'w') as f:    
+    #     json.dump(tot_perf_lag,f)  
        
-    with open(json_filename+"_"+key_metric[1]+"_"+yaml_filename+"_"+'yaml'+".json",'w') as f:    
-        json.dump(tot_perf_no_lag,f)  
+    # with open(json_filename+"_"+key_metric[1]+"_"+yaml_filename+"_"+'yaml'+".json",'w') as f:    
+    #     json.dump(tot_perf_no_lag,f)  
         
     
         
