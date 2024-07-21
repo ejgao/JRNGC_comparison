@@ -115,7 +115,8 @@ if '__main__' == __name__:
             if args.data_type == 'var':
                 print("generating data from scratch...")
                 x, x_eval, gc, beta= var_stable(d=num_nodes, t=args.var_t, t_eval=args.var_t_eval, lag=params['true_lag'], sd=params['noise_scale'],seed=cur_seed)
-                print(beta)
+                print(x.shape)
+                print(beta.shape)
                 np.save(data_dir+data_name+'_x.npy',x)
                 np.save(data_dir+data_name+'_x_eval.npy',x_eval)
                 np.save(data_dir+data_name+'_gc.npy',gc)
