@@ -106,6 +106,7 @@ if '__main__' == __name__:
 
         try:
             x = np.load(data_dir+data_name+'_x.npy')
+            print(x.shape)
             x_eval = np.load(data_dir+data_name+'_x_eval.npy')
             gc = np.load(data_dir+data_name+'_gc.npy')
             print("data loaded...")
@@ -113,11 +114,11 @@ if '__main__' == __name__:
             
             if args.data_type == 'var':
                 print("generating data from scratch...")
-                x, x_eval, gc, beta = var_stable(d=num_nodes, t=args.var_t, t_eval=args.var_t_eval, lag=params['true_lag'], sd=params['noise_scale'],seed=cur_seed)
+                x, x_eval, gc, beta= var_stable(d=num_nodes, t=args.var_t, t_eval=args.var_t_eval, lag=params['true_lag'], sd=params['noise_scale'],seed=cur_seed)
+                print(beta)
                 np.save(data_dir+data_name+'_x.npy',x)
                 np.save(data_dir+data_name+'_x_eval.npy',x_eval)
                 np.save(data_dir+data_name+'_gc.npy',gc)
-                np.save(data_dir+data_name+'_beta.npy', beta)
 
             elif args.data_type == 'fmri':
                 print('-----fmri----')
@@ -170,7 +171,6 @@ if '__main__' == __name__:
         os.makedirs(os.path.dirname(result_filename), exist_ok=True)
         #results = []
         for it in ret:
-            print("Hi")
             #print()
             #print(f"f1: {it['f1']:.3f}, f1_eps: {it['f1_eps']:.3f}")
             #print(f"acc: {it['acc']:.3f}, acc_eps: {it['acc_eps']:.3f}")
@@ -208,6 +208,7 @@ if '__main__' == __name__:
     auprc_sd = np.std(auprc_scores)
     means = [f1_mean, f1_eps_mean, acc_mean, acc_eps_mean, auroc_mean, auprc_mean]
     sds = [f1_sd, f1_eps_sd, acc_sd, acc_eps_sd, auroc_sd, auprc_sd]
+    print("F1, F1_eps, ACC, ACC_EPS, AUROC, AUPRC")
     print("Averages:")
     print(means)
     print("SDS: ")

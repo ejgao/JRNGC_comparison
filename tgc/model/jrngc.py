@@ -162,8 +162,8 @@ class JRNGC(nn.Module):
         np.random.seed(seed)
         num_nodes = x.shape[0]
 
-        x = torch.tensor(x, device=device).to(torch.float16)
-        x_eval = torch.tensor(x_eval, device=device).to(torch.float16)
+        x = torch.tensor(x, device=device).to(torch.float32)
+        x_eval = torch.tensor(x_eval, device=device).to(torch.float32)
         if 2 == len(x.shape): x.unsqueeze_(0)
         if 2 == len(x_eval.shape): x_eval.unsqueeze_(0)
         x = x.transpose(1, 2).unfold(1, lag + 1, 1)
