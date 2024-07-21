@@ -55,4 +55,4 @@ def var_stable(d, t, t_eval, lag, sparsity=0.2, beta_value=1.0, sd=0.1, seed=0):
     m = np.mean(x, axis=1, keepdims=True)
     sd = np.std(x, axis=1, keepdims=True)
     x = (x - m) / sd
-    return x[:, :t], x[:, :t], gc, beta
+    return x[:, :t], x[:, :t], gc, beta #beta is d by d by t

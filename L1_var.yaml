@@ -1,4 +1,4 @@
-d: 10
+d: 5
 dropout: 0.5
 hidden: 100
 inputgate_lam: 0.01
@@ -6,7 +6,7 @@ inputgate_regular: 'GL'
 lag: 5
 layers: 0
 lr: !!float 1e-3
-max_iter: 10000
+max_iter: 100
 outputgate_lam: 0
 verbose: true
 jacobian_lam: !!float 0.01
