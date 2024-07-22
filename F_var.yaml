@@ -1,10 +1,10 @@
 d: 10
-dropout: 0.2
-hidden: 50
+dropout: 0.5
+hidden: 100
 lag: 5
-layers: 0
+layers: 4
 lr: !!float 1e-3
-max_iter: 10000
+max_iter: 1000
 verbose: true
 jacobian_lam: !!float 0.01
 struct_loss_choice: 'JF'

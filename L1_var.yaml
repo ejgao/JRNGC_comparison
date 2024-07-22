@@ -1,17 +1,17 @@
-d: 5
+d: 10
 dropout: 0.5
 hidden: 100
 inputgate_lam: 0.01
 inputgate_regular: 'GL'
 lag: 5
-layers: 0
+layers: 4
 lr: !!float 1e-3
-max_iter: 100
+max_iter: 1000
 outputgate_lam: 0
 verbose: true
 jacobian_lam: !!float 0.01
 struct_loss_choice: 'JL1'
-trials: 6
+trials: 5
 true_lag: 3
 noise_scale: 1
 JFn: 1
