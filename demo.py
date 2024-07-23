@@ -107,7 +107,7 @@ if "__main__" == __name__:
             os.makedirs(data_dir + data_name)
 
         try:  # loading data
-            1/0 
+            #1/0 
             x = np.load(data_dir + data_name + "_x.npy")
             print(x.shape)
             x_eval = np.load(data_dir + data_name + "_x_eval.npy")
@@ -117,16 +117,16 @@ if "__main__" == __name__:
 
             if args.data_type == "var":
                 print("generating data from scratch...")
-                # x, x_eval, gc, beta = var_stable(
-                #     d=num_nodes,
-                #     t=args.var_t,
-                #     t_eval=args.var_t_eval,
-                #     lag=params["true_lag"],
-                #     sd=params["noise_scale"],
-                #     seed=cur_seed,
-                # ) 
+                x, x_eval, gc, beta = var_stable(
+                    d=num_nodes,
+                    t=args.var_t,
+                    t_eval=args.var_t_eval,
+                    lag=params["true_lag"],
+                    sd=params["noise_scale"],
+                    seed=cur_seed,
+                ) 
                 # change generate data to a function which calls var_stable
-                x, x_eval, y, a_mat = custom_var_function(n = 1000, p = num_nodes, seed = cur_seed)
+                #x, x_eval, y, a_mat = custom_var_function(n = 1000, p = num_nodes, seed = cur_seed)
                 #print(x.shape)
                 #print(beta.shape)
                 #np.save(data_dir + data_name + "_x.npy", x)
