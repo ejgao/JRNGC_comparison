@@ -61,19 +61,19 @@ def var_stable(d, t, t_eval, lag, sparsity=0.2, beta_value=1.0, sd=0.1, seed=0):
     return x[:, :t], x[:, :t], gc, beta #beta is d by d by t
 
 # get rid of all this and write our own
-def custom_var_function(n, p, seed):
-    np.random.seed(seed)
-    a = 1/p * np.eye(p)
-    a[1, 3] = -0.7
-    a[4, 7] = -0.7
-    a[2, 5] = 0.9
-    a[7, 1] = 0.9
-    x = np.zeros([n, p])
-    for i in range(1, n):
-        x[i] = a @ x[i - 1] + np.random.normal(0, 1, [1, p])
-    y = x[3: ]
-    x = x[2:-1]
-    y = torch.tensor(y)
-    x = torch.tensor(x)
+# def custom_var_function(n, p, seed):
+#     np.random.seed(seed)
+#     a = 1/p * np.eye(p)
+#     a[1, 3] = -0.7
+#     a[4, 7] = -0.7
+#     a[2, 5] = 0.9
+#     a[7, 1] = 0.9
+#     x = np.zeros([n, p])
+#     for i in range(1, n):
+#         x[i] = a @ x[i - 1] + np.random.normal(0, 1, [1, p])
+#     y = x[3: ]
+#     x = x[2:-1]
+#     y = torch.tensor(y)
+#     x = torch.tensor(x)
 
     return x, x, y, a
