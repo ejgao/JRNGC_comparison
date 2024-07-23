@@ -58,7 +58,8 @@ class JRNGC(nn.Module):
 
         
 
-        self.inputgate = nn.Linear(d * lag, hidden)
+        #self.inputgate = nn.Linear(d * lag, hidden)
+        self.inputgate = nn.Linear(d * 1, hidden)
         self.outputgate = nn.Linear(hidden, d)
         self.inputgate = torch.nn.utils.weight_norm(self.inputgate)
 
@@ -105,11 +106,13 @@ class JRNGC(nn.Module):
         """
         with amp.autocast():
             x.requires_grad_(True)
-            jac = torch.zeros((x.shape[0], x.shape[1], x.shape[1], x.shape[2]))
+            #jac = torch.zeros((x.shape[0], x.shape[1], x.shape[1], x.shape[2]))
+            jac = torch.zeros((x.shape[0], x.shape[0], x.shape[1]))
             # start_time = time.time()
             for j in range(x.shape[1]):
                 y = self(x)[:, j]
-                jac[:, j, :, :] = torch.autograd.grad(y,x,create_graph=True,grad_outputs=torch.ones_like(y))[0]
+                jac[:, j, :] = torch.autograd.grad(y,x,create_graph=True,grad_outputs=torch.ones_like(y))[0]
+                #jac[:, j, :, :] = torch.autograd.grad(y,x,create_graph=True,grad_outputs=torch.ones_like(y))[0]
             # end_time = time.time()
             # print('time:',end_time-start_time)
             jac = torch.mean(torch.abs(jac), dim=0)
@@ -120,32 +123,33 @@ class JRNGC(nn.Module):
     def compute_jacobian_F_loss(self,x):
         Jacobian_Reg = JacobianReg(n=self.JFn)
 
-        if 2 == len(x.shape): x.unsqueeze_(0)
-        x = x.transpose(1, 2).unfold(1, self.lag, 1)
-        x = x.reshape(x.shape[0] * x.shape[1], x.shape[2], x.shape[3])
+        # if 2 == len(x.shape): x.unsqueeze_(0)
+        # x = x.transpose(1, 2).unfold(1, self.lag, 1)
+        # x = x.reshape(x.shape[0] * x.shape[1], x.shape[2], x.shape[3])
         x.requires_grad_(True)
         y = self(x)
         JAC_loss = self.jacobian_lam*Jacobian_Reg(x,y)
         return JAC_loss
    
     def jacobian_causal_L1_loss(self, x):
-        # x = torch.tensor(x, device=next(self.parameters()).device)
-        if 2 == len(x.shape): x.unsqueeze_(0)
-        x = x.transpose(1, 2).unfold(1, self.lag, 1)
-        x = x.reshape(x.shape[0] * x.shape[1], x.shape[2], x.shape[3])
+        x = torch.tensor(x, device=next(self.parameters()).device)
+        # if 2 == len(x.shape): x.unsqueeze_(0)
+        # x = x.transpose(1, 2).unfold(1, self.lag, 1)
+        # x = x.reshape(x.shape[0] * x.shape[1], x.shape[2], x.shape[3])
         jac = self.jacobian_causal_train(x)
         jac_loss = torch.sum(jac)*self.jacobian_lam
 
         return jac_loss
         
     
-    def exper_loss(self, x):
+    def exper_loss(self, x, y):
         """
         x: [batch, d, T=lag+1]
         """
         return self.loss_fn(
-            self(x[:, :, :-1]),
-            x[:, :, -1]
+            #self(x[:, :, :-1]),
+            #x[:, :, -1]
+            self(x), y
         )
     
     #[0,1,2,3,4,5]
@@ -154,22 +158,23 @@ class JRNGC(nn.Module):
  
 
     # @staticmethod
-    def from_train(d, lag, layers, hidden, dropout,jacobian_lam,struct_loss_choice,JFn, x, x_eval, lr, seed, device, min_iter=1000, max_iter=10000, lookback=10, check_first=50, check_every=100, verbose=False,relu=False):
+    def from_train(d, lag, layers, hidden, dropout,jacobian_lam,struct_loss_choice,JFn, x, x_eval, y, lr, seed, device, min_iter=1000, max_iter=10000, lookback=10, check_first=50, check_every=100, verbose=False,relu=False):
         """
         x: [d, t] or [batch, d, t]
         """
         torch.manual_seed(seed)
         np.random.seed(seed)
-        num_nodes = x.shape[0]
+        #num_nodes = x.shape[0]
+        num_nodes = x.shape[1]
 
         x = torch.tensor(x, device=device).to(torch.float32)
         x_eval = torch.tensor(x_eval, device=device).to(torch.float32)
-        if 2 == len(x.shape): x.unsqueeze_(0)
-        if 2 == len(x_eval.shape): x_eval.unsqueeze_(0)
-        x = x.transpose(1, 2).unfold(1, lag + 1, 1)
-        x_eval = x_eval.transpose(1, 2).unfold(1, lag + 1, 1)
-        x = x.reshape(x.shape[0] * x.shape[1], x.shape[2], x.shape[3])
-        x_eval = x_eval.reshape(x_eval.shape[0] * x_eval.shape[1], x_eval.shape[2], x_eval.shape[3])
+        # if 2 == len(x.shape): x.unsqueeze_(0)
+        # if 2 == len(x_eval.shape): x_eval.unsqueeze_(0)
+        # x = x.transpose(1, 2).unfold(1, lag + 1, 1)
+        # x_eval = x_eval.transpose(1, 2).unfold(1, lag + 1, 1)
+        # x = x.reshape(x.shape[0] * x.shape[1], x.shape[2], x.shape[3])
+        # x_eval = x_eval.reshape(x_eval.shape[0] * x_eval.shape[1], x_eval.shape[2], x_eval.shape[3])
         model = JRNGC(d, lag, layers, hidden, dropout, jacobian_lam, struct_loss_choice, JFn).to(device)
        
         optimizer = torch.optim.Adam(model.parameters(), lr=lr)
@@ -183,7 +188,7 @@ class JRNGC(nn.Module):
             # train
             with amp.autocast():
                 model.train()
-                pred_loss = model.exper_loss(x)
+                pred_loss = model.exper_loss(x, y)
                 if model.struct_loss_choice == 'JL1':
                     struct_loss = model.jacobian_causal_L1_loss(x)
                 
@@ -194,7 +199,8 @@ class JRNGC(nn.Module):
                     struct_loss = 0
                 loss = pred_loss + struct_loss
                 
-                scaler.scale(loss).float().backward()
+                loss = loss.to(torch.float32)
+                scaler.scale(loss).backward()
                 scaler.step(optimizer)
                 scaler.update()
          
@@ -209,7 +215,8 @@ class JRNGC(nn.Module):
                 # eval
                 with torch.no_grad():
                     model.eval()
-                    eval_loss = model.exper_loss(x_eval) / d
+                    eval_loss = model.exper_loss(x_eval, y)
+                    #eval_loss = model.exper_loss(x_eval) / d
                 eval_loss_list.append(eval_loss.detach().item())
 
                 # 

@@ -4,6 +4,7 @@ from tgc.model import JRNGC
 from tgc.data import (
     lorenz_96,
     var_stable,
+    custom_var_function,
     fmri_net_sim,
     dream3_trajectories,
     dream4_trajectories,
@@ -65,7 +66,7 @@ def get_model(dir):
 
     return data_parameters, torch.load(dir + "model.pt")
 
-# add any functions defined here
+# add any functions defined
 
 if "__main__" == __name__:
     tot_perf_lag = {}
@@ -106,7 +107,7 @@ if "__main__" == __name__:
             os.makedirs(data_dir + data_name)
 
         try:  # loading data
-            #1/0 
+            1/0 
             x = np.load(data_dir + data_name + "_x.npy")
             print(x.shape)
             x_eval = np.load(data_dir + data_name + "_x_eval.npy")
@@ -116,20 +117,22 @@ if "__main__" == __name__:
 
             if args.data_type == "var":
                 print("generating data from scratch...")
-                x, x_eval, gc, beta = var_stable(
-                    d=num_nodes,
-                    t=args.var_t,
-                    t_eval=args.var_t_eval,
-                    lag=params["true_lag"],
-                    sd=params["noise_scale"],
-                    seed=cur_seed,
-                ) # change generate data to a function which calls var_stable
-                print(x.shape)
-                print(beta.shape)
-                np.save(data_dir + data_name + "_x.npy", x)
-                np.save(data_dir + data_name + "_x_eval.npy", x_eval)
-                np.save(data_dir + data_name + "_gc.npy", gc)
-                np.save(data_dir + data_name + "_beta.npy", beta)  # save the beta
+                # x, x_eval, gc, beta = var_stable(
+                #     d=num_nodes,
+                #     t=args.var_t,
+                #     t_eval=args.var_t_eval,
+                #     lag=params["true_lag"],
+                #     sd=params["noise_scale"],
+                #     seed=cur_seed,
+                # ) 
+                # change generate data to a function which calls var_stable
+                x, x_eval, y, a_mat = custom_var_function(n = 1000, p = num_nodes, seed = cur_seed)
+                #print(x.shape)
+                #print(beta.shape)
+                #np.save(data_dir + data_name + "_x.npy", x)
+                #np.save(data_dir + data_name + "_x_eval.npy", x_eval)
+                #np.save(data_dir + data_name + "_gc.npy", gc)
+                #np.save(data_dir + data_name + "_beta.npy", beta)  # save the beta
 
             elif args.data_type == "fmri":
                 print("-----fmri----")
@@ -174,6 +177,7 @@ if "__main__" == __name__:
                     JFn=params["JFn"],
                     x=x,
                     x_eval=x_eval,
+                    y = y, 
                     lr=params["lr"],
                     seed=cur_seed,
                     device=device,
@@ -195,6 +199,7 @@ if "__main__" == __name__:
                     JFn=params["JFn"],
                     x=x,
                     x_eval=x_eval,
+                    y = y,
                     lr=params["lr"],
                     seed=cur_seed,
                     device=device,

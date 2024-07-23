@@ -1,5 +1,6 @@
 import numpy as np
 from ..runcase import data_decorator
+import torch
 
 def make_var_stationary(beta, radius=0.998):
     '''Rescale coefficients of VAR model to make stable.'''
@@ -43,12 +44,14 @@ def var_stable(d, t, t_eval, lag, sparsity=0.2, beta_value=1.0, sd=0.1, seed=0):
 
    
     burn_in = 500
-    errors = np.random.normal(scale=sd, size=(d, t + t_eval + burn_in))
-    x = np.zeros((d, t + t_eval + burn_in))
-    x[:, :lag] = errors[:, :lag]
+    errors = np.random.normal(scale=sd, size=(t + t_eval + burn_in, d))
+    #x = np.zeros((d, t + t_eval + burn_in))
+    #x[:, :lag] = errors[:, :lag]
+    x = np.zeros((t + t_eval + burn_in, d))
+    x[:lag, :] = errors[:lag, :]
     for t in range(lag, t + t_eval + burn_in):
-        x[:, t] = np.einsum('jit,it->j', beta, x[:,t - lag:t]) + errors[:, t]
-    
+        #x[:, t] = np.einsum('jit,it->j', beta, x[:,t - lag:t]) + errors[:, t]
+        x[t, :] = np.einsum("jit,it->j", beta, x[t-lag:t, :] + errors[t, :])
    
 
     x = x[:, burn_in:].astype(np.float32)
@@ -56,3 +59,22 @@ def var_stable(d, t, t_eval, lag, sparsity=0.2, beta_value=1.0, sd=0.1, seed=0):
     sd = np.std(x, axis=1, keepdims=True)
     x = (x - m) / sd
     return x[:, :t], x[:, :t], gc, beta #beta is d by d by t
+
+# get rid of all this and write our own
+@data_decorator
+def custom_var_function(n, p, seed):
+    np.random.seed(seed)
+    a = 1/p * np.eye(p)
+    a[1, 3] = -0.7
+    a[4, 7] = -0.7
+    a[2, 5] = 0.9
+    a[7, 1] = 0.9
+    x = np.zeros([n, p])
+    for i in range(1, n):
+        x[i] = a @ x[i - 1] + np.random.normal(0, 1, [1, p])
+    y = x[3: ]
+    x = x[2:-1]
+    y = torch.tensor(y)
+    x = torch.tensor(x)
+
+    return x, x, y, a
